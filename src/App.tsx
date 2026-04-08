@@ -1,31 +1,24 @@
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getDatabase, ref, set } from 'firebase/database'
-import { app } from './firebase'
-
-const db = getDatabase(app)
-const auth = getAuth(app)
+import { useAuth } from '@/hooks/useAuth';
+import Login from '@/components/cms/Login';
+import Home from '@/pages/Home';
 
 function App() {
+  const { isAuthenticated, loading } = useAuth();
 
-  const signupUser = () => {
-    createUserWithEmailAndPassword(auth, 'faizan.devstack@gmail.com', 'password123').then((value) => console.log(value))
+  if (loading) {
+    return (
+      <div className='min-h-screen bg-background flex items-center justify-center'>
+        <div className='text-center space-y-4'>
+          <div className='inline-flex animate-spin'>
+            <div className='h-8 w-8 border-4 border-primary border-t-transparent rounded-full' />
+          </div>
+          <p className='text-muted-foreground'>Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  const putData = () => {
-    set(ref(db, 'users/faizan'), {
-      id: 1,
-      name: 'Muhammad Faizan',
-      age: 21,
-    });
-  };
-
-  return (
-    <div className='flex flex-col justify-center min-h-screen items-center'>
-      <h1 className=''>Firebase React App</h1>
-      <button onClick={putData}>Put Data</button>
-      <button onClick={signupUser}>Signup User</button>
-    </div>
-  )
+  return isAuthenticated ? <Home /> : <Login />;
 }
 
-export default App
+export default App;

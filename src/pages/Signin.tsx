@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { app } from '@/firebase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,39 +7,39 @@ import { useState } from 'react';
 const auth = getAuth(app)
 const googleProvider = new GoogleAuthProvider();
 
-export default function Signup() {
+export default function Signin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const signupUser = async () => {
+  const signinUser = async () => {
     setLoading(true)
     setError('')
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password)
-      console.log('User created:', result)
+      const result = await signInWithEmailAndPassword(auth, email, password)
+      console.log('User signed in:', result)
       setEmail('')
       setPassword('')
     } catch (err: any) {
       setError(err.message)
-      console.error('Signup error:', err)
+      console.error('Signin error:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const signupWithGoogle = async () => {
+  const signinWithGoogle = async () => {
     setLoading(true)
     setError('')
     try {
       await signInWithPopup(auth, googleProvider)
-      console.log('User signed up with Google')
+      console.log('User signed in with Google')
       setEmail('')
       setPassword('')
     } catch (err: any) {
       setError(err.message)
-      console.error('Google signup error:', err)
+      console.error('Google signin error:', err)
     } finally {
       setLoading(false)
     }
@@ -48,7 +48,7 @@ export default function Signup() {
   return (
     <div className='min-h-screen bg-canvas-base flex items-center justify-center p-4'>
       <div className='bg-canvas-bg rounded-2xl border border-canvas-border shadow-lg p-8 space-y-6 w-full max-w-md'>
-        <h1 className='text-3xl font-bold text-center text-canvas-text-contrast'>Create Account</h1>
+        <h1 className='text-3xl font-bold text-center text-canvas-text-contrast'>Sign In</h1>
         
         <div className='space-y-4'>
           <div>
@@ -76,11 +76,11 @@ export default function Signup() {
           )}
 
           <Button 
-            onClick={signupUser}
+            onClick={signinUser}
             disabled={loading || !email || !password}
             className='w-full'
           >
-            {loading ? 'Creating Account...' : 'Sign Up'}
+            {loading ? 'Signing In...' : 'Sign In'}
           </Button>
 
           <div className='relative'>
@@ -93,12 +93,12 @@ export default function Signup() {
           </div>
 
           <Button 
-            onClick={signupWithGoogle}
+            onClick={signinWithGoogle}
             disabled={loading}
             variant='outline'
             className='w-full'
           >
-            {loading ? 'Signing up...' : '🔍 Sign up with Google'}
+            {loading ? 'Signing in...' : '🔍 Sign in with Google'}
           </Button>
         </div>
       </div>
