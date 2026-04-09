@@ -71,7 +71,7 @@ export interface User {
   id: string;
   email: string;
   displayName: string;
-  role: 'admin' | 'manager' | 'operator' | 'viewer';
+  role: 'admin' | 'warehouse';
   createdAt: Date;
   lastLogin?: Date;
 }

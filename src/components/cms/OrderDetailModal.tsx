@@ -58,8 +58,12 @@ export default function OrderDetailModal({
   const [packingSlipUrl, setPackingSlipUrl] = useState(order.trackingNumber || '');
 
   // RBAC: Check permissions
+  // Admin: Full access (edit status, notes, upload, mark exception, delete)
+  // Warehouse: View and update status only
   const isAdmin = role === 'admin';
-  const canMarkException = isAdmin || role === 'warehouse' || role === 'manager';
+  const isWarehouse = role === 'warehouse';
+  const canEditDetails = isAdmin;
+  const canMarkException = isAdmin;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -169,16 +173,16 @@ export default function OrderDetailModal({
         <div className='space-y-6'>
           {/* Error Alert */}
           {error && (
-            <div className='bg-destructive/10 border border-destructive/30 rounded-lg p-4 flex gap-3'>
-              <AlertCircle className='h-5 w-5 text-destructive shrink-0 mt-0.5' />
-              <p className='text-sm text-destructive'>{error}</p>
+            <div className='bg-alert-bg border border-alert-border rounded-lg p-4 flex gap-3'>
+              <AlertCircle className='h-5 w-5 text-alert-text shrink-0 mt-0.5' />
+              <p className='text-sm text-alert-text'>{error}</p>
             </div>
           )}
 
           {/* Current Status */}
-          <Card className='border border-border bg-muted/30 p-4'>
+          <Card className='border border-canvas-border bg-canvas-bg-subtle p-4'>
             <div className='space-y-2'>
-              <p className='text-sm font-medium text-muted-foreground'>Current Status</p>
+              <p className='text-sm font-medium text-canvas-text'>Current Status</p>
               <Badge
                 className={`${STATUS_COLORS[order.status]} capitalize text-base px-3 py-1`}
               >
@@ -190,20 +194,20 @@ export default function OrderDetailModal({
           {/* Customer Info */}
           <div className='grid grid-cols-2 gap-4'>
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-1'>Customer Name</p>
-              <p className='font-medium text-foreground'>{order.customerName}</p>
+              <p className='text-sm font-medium text-canvas-text mb-1'>Customer Name</p>
+              <p className='font-medium text-canvas-text-contrast'>{order.customerName}</p>
             </div>
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-1'>Email</p>
-              <p className='text-sm text-foreground'>{order.customerEmail}</p>
+              <p className='text-sm font-medium text-canvas-text mb-1'>Email</p>
+              <p className='text-sm text-canvas-text-contrast'>{order.customerEmail}</p>
             </div>
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-1'>Phone</p>
-              <p className='text-sm text-foreground'>{order.customerPhone}</p>
+              <p className='text-sm font-medium text-canvas-text mb-1'>Phone</p>
+              <p className='text-sm text-canvas-text-contrast'>{order.customerPhone}</p>
             </div>
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-1'>Order Date</p>
-              <p className='text-sm text-foreground'>
+              <p className='text-sm font-medium text-canvas-text mb-1'>Order Date</p>
+              <p className='text-sm text-canvas-text-contrast'>
                 {new Date(order.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -211,8 +215,8 @@ export default function OrderDetailModal({
 
           {/* Shipping Address */}
           <div>
-            <p className='text-sm font-medium text-muted-foreground mb-2'>Shipping Address</p>
-            <div className='bg-muted/50 border border-border rounded p-3 text-sm text-foreground whitespace-pre-wrap'>
+            <p className='text-sm font-medium text-canvas-text mb-2'>Shipping Address</p>
+            <div className='bg-canvas-bg-subtle border border-canvas-border rounded p-3 text-sm text-canvas-text-contrast whitespace-pre-wrap'>
               {order.shippingAddress}
             </div>
           </div>
@@ -220,21 +224,21 @@ export default function OrderDetailModal({
           {/* Items */}
           {order.items.length > 0 && (
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-2'>
+              <p className='text-sm font-medium text-canvas-text mb-2'>
                 Items ({order.items.length})
               </p>
               <div className='space-y-2'>
                 {order.items.map((item) => (
                   <div
                     key={item.id}
-                    className='bg-muted/50 border border-border rounded p-3 flex justify-between'
+                    className='bg-canvas-bg-subtle border border-canvas-border rounded p-3 flex justify-between'
                   >
                     <div>
-                      <p className='font-medium text-foreground'>{item.productName}</p>
-                      <p className='text-xs text-muted-foreground'>SKU: {item.sku}</p>
+                      <p className='font-medium text-canvas-text-contrast'>{item.productName}</p>
+                      <p className='text-xs text-canvas-text'>SKU: {item.sku}</p>
                     </div>
                     <div className='text-right'>
-                      <p className='font-medium text-foreground'>
+                      <p className='font-medium text-canvas-text-contrast'>
                         {item.quantity} × ${item.price}
                       </p>
                     </div>
@@ -246,10 +250,10 @@ export default function OrderDetailModal({
 
           {/* Total Amount */}
           {order.totalAmount > 0 && (
-            <div className='bg-primary/5 border border-primary/20 rounded p-4'>
+            <div className='bg-primary-bg border border-primary-border rounded p-4'>
               <div className='flex justify-between items-center'>
-                <p className='font-medium text-foreground'>Total Amount</p>
-                <p className='text-2xl font-bold text-primary'>
+                <p className='font-medium text-canvas-text-contrast'>Total Amount</p>
+                <p className='text-2xl font-bold text-primary-solid'>
                   ${order.totalAmount.toFixed(2)}
                 </p>
               </div>
@@ -259,26 +263,26 @@ export default function OrderDetailModal({
           {/* Tracking Info */}
           {order.trackingNumber && (
             <div>
-              <p className='text-sm font-medium text-muted-foreground mb-1'>Tracking Number</p>
-              <p className='font-mono text-sm text-foreground'>{order.trackingNumber}</p>
+              <p className='text-sm font-medium text-canvas-text mb-1'>Tracking Number</p>
+              <p className='font-mono text-sm text-canvas-text-contrast'>{order.trackingNumber}</p>
             </div>
           )}
 
           {/* Notes Editor */}
           <div className='space-y-2'>
-            <label className='block text-sm font-medium text-foreground'>Notes</label>
+            <label className='block text-sm font-medium text-canvas-text-contrast'>Notes</label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder='Add or edit order notes...'
-              disabled={isUpdating}
-              className='min-h-24 bg-muted/50'
+              disabled={isUpdating || !canEditDetails}
+              className='min-h-24 bg-canvas-bg-subtle'
             />
           </div>
 
           {/* Firebase Storage - Upload Packing Slip */}
           <div className='space-y-2'>
-            <label className='block text-sm font-medium text-foreground'>
+            <label className='block text-sm font-medium text-canvas-text-contrast'>
               Upload Packing Slip
             </label>
             <div className='flex gap-2'>
@@ -286,7 +290,7 @@ export default function OrderDetailModal({
                 <input
                   type='file'
                   onChange={handleFileUpload}
-                  disabled={isUploading || isUpdating}
+                  disabled={isUploading || isUpdating || !canEditDetails}
                   className='hidden'
                   accept='.pdf,.jpg,.jpeg,.png,.doc,.docx'
                 />
@@ -294,8 +298,9 @@ export default function OrderDetailModal({
                   type='button'
                   variant='outline'
                   className='w-full gap-2 cursor-pointer'
-                  disabled={isUploading || isUpdating}
+                  disabled={isUploading || isUpdating || !canEditDetails}
                   asChild
+                  title={!canEditDetails ? 'Only admins can upload files' : undefined}
                 >
                   <span>
                     {isUploading ? (
@@ -313,7 +318,7 @@ export default function OrderDetailModal({
                 </Button>
               </label>
             </div>
-            <p className='text-xs text-muted-foreground'>
+            <p className='text-xs text-canvas-text'>
               PDF, JPG, PNG, DOC, DOCX (Max size varies by Firebase plan)
             </p>
             {packingSlipUrl && (
@@ -327,12 +332,12 @@ export default function OrderDetailModal({
 
           {/* Status Change Dropdown */}
           <div className='space-y-2'>
-            <label className='block text-sm font-medium text-foreground'>Change Status</label>
+            <label className='block text-sm font-medium text-canvas-text-contrast'>Change Status</label>
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
               disabled={isUpdating}
-              className='w-full px-3 py-2 bg-muted/50 border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full px-3 py-2 bg-canvas-bg-subtle border border-canvas-border rounded-md text-sm text-canvas-text-contrast focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
@@ -343,7 +348,7 @@ export default function OrderDetailModal({
           </div>
 
           {/* Actions */}
-          <div className='flex gap-2 justify-end pt-4 border-t border-border flex-wrap'>
+          <div className='flex gap-2 justify-end pt-4 border-t border-canvas-border flex-wrap'>
             <Button
               type='button'
               variant='outline'
@@ -390,11 +395,11 @@ export default function OrderDetailModal({
           </div>
 
           {/* Permissions Notice */}
-          {!canMarkException && (
+          {!canEditDetails && isWarehouse && (
             <div className='bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded p-3 text-xs text-blue-800 dark:text-blue-200'>
               <p>
-                <span className='font-medium'>Note:</span> Your role ({role || 'viewer'}) does not
-                have permission to mark exceptions. Contact an administrator.
+                <span className='font-medium'>Warehouse Operator:</span> You can update the order status
+                but cannot edit notes, upload files, or mark exceptions. Only admins have those permissions.
               </p>
             </div>
           )}

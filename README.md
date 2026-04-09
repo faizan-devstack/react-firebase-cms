@@ -34,7 +34,7 @@ Access at: `http://localhost:5173`
 ### ✅ Authentication & Security
 - Email/password Firebase authentication
 - Auto-create accounts on signup
-- Role-based access control (Admin, Manager, Warehouse, Viewer)
+- Role-based access control (Admin, Warehouse Operator)
 - Persistent user state across refreshes
 
 ### ✅ Dashboard & Real-Time Stats
@@ -58,14 +58,16 @@ Access at: `http://localhost:5173`
 - Confirmation dialogs for destructive actions
 
 ### ✅ Role-Based Access Control (RBAC)
-| Feature | Admin | Manager | Warehouse | Viewer |
-|---------|:-----:|:-------:|:---------:|:------:|
-| View Orders | ✓ | ✓ | ✓ | ✓ |
-| Create Orders | ✓ | ✓ | ✓ | ✗ |
-| Edit Status/Notes | ✓ | ✓ | ✓ | ✗ |
-| Mark Exception | ✓ | ✓ | ✓ | ✗ |
-| Resolve Exception | ✓ | ✓ | ✓ | ✗ |
-| Delete Orders | ✓ | ✗ | ✗ | ✗ |
+| Feature | Admin | Warehouse |
+|---------|:-----:|:---------:|
+| View Orders | ✓ | ✓ |
+| Create Orders | ✓ | ✗ |
+| Edit Status | ✓ | ✓ |
+| Edit Notes | ✓ | ✗ |
+| Mark Exception | ✓ | ✗ |
+| Resolve Exception | ✓ | ✓ |
+| Upload Packing Slip | ✓ | ✗ |
+| Delete Orders | ✓ | ✗ |
 
 ### ✅ Responsive Design
 - Mobile-first layout (1-2-4 col grid on mobile-tablet-desktop)
@@ -172,13 +174,13 @@ service cloud.firestore {
     match /orders/{document=**} {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && 
-          request.auth.token.role in ['admin', 'manager', 'warehouse'];
+          request.auth.token.role in ['admin', 'warehouse'];
       allow delete: if request.auth?.token?.role == 'admin';
     }
     match /exceptions/{document=**} {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && 
-          request.auth.token.role in ['admin', 'manager', 'warehouse'];
+          request.auth.token.role in ['admin', 'warehouse'];
       allow delete: if request.auth?.token?.role == 'admin';
     }
   }

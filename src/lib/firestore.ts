@@ -7,6 +7,7 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
   Timestamp,
   type Unsubscribe,
@@ -252,6 +253,19 @@ export async function updateException(
     });
   } catch (error) {
     console.error('Error updating exception:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete order
+ */
+export async function deleteOrder(orderId: string): Promise<void> {
+  try {
+    const orderRef = doc(firestore, ORDERS_COLLECTION, orderId);
+    await deleteDoc(orderRef);
+  } catch (error) {
+    console.error('Error deleting order:', error);
     throw error;
   }
 }

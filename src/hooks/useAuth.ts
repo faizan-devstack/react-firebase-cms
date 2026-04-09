@@ -13,7 +13,7 @@ import { app } from '@/firebase';
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 
-export type UserRole = 'admin' | 'warehouse' | 'manager' | 'viewer' | null;
+export type UserRole = 'admin' | 'warehouse' | null;
 
 interface AuthContextType {
   user: User | null;

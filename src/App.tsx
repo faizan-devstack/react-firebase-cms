@@ -7,12 +7,12 @@ function App() {
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-background flex items-center justify-center'>
+      <div className='min-h-screen bg-canvas-base flex items-center justify-center'>
         <div className='text-center space-y-4'>
           <div className='inline-flex animate-spin'>
-            <div className='h-8 w-8 border-4 border-primary border-t-transparent rounded-full' />
+            <div className='h-8 w-8 border-4 border-primary-solid border-t-transparent rounded-full' />
           </div>
-          <p className='text-muted-foreground'>Loading...</p>
+          <p className='text-canvas-text'>Loading...</p>
         </div>
       </div>
     );

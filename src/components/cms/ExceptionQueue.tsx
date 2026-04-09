@@ -85,10 +85,10 @@ export default function ExceptionQueue() {
 
   if (loading) {
     return (
-      <Card className='border border-border'>
+      <Card className='border border-canvas-border'>
         <div className='p-6 space-y-3'>
           {[1, 2, 3].map((i) => (
-            <div key={i} className='h-12 bg-muted rounded animate-pulse' />
+            <div key={i} className='h-12 bg-canvas-bg-subtle rounded animate-pulse' />
           ))}
         </div>
       </Card>
@@ -97,14 +97,14 @@ export default function ExceptionQueue() {
 
   return (
     <>
-      <Card className='border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20'>
+      <Card className='border border-red-200 dark:border-red-900 bg-alert-bg dark:bg-alert-bg'>
         <div className='p-6 space-y-4'>
           {/* Header */}
           <div className='flex items-center gap-3'>
-            <AlertCircle className='h-6 w-6 text-red-600' />
+            <AlertCircle className='h-6 w-6 text-alert-solid' />
             <div>
-              <h2 className='text-lg font-semibold text-foreground'>Exception Queue</h2>
-              <p className='text-sm text-muted-foreground'>
+              <h2 className='text-lg font-semibold text-canvas-text-contrast'>Exception Queue</h2>
+              <p className='text-sm text-canvas-text'>
                 {exceptionOrders.length} order{exceptionOrders.length !== 1 ? 's' : ''} requiring
                 attention
               </p>
@@ -112,9 +112,9 @@ export default function ExceptionQueue() {
           </div>
 
           {/* Role Info */}
-          <div className='bg-background/50 border border-border rounded p-3 text-xs text-muted-foreground space-y-1'>
+          <div className='bg-canvas-base/50 border border-canvas-border rounded p-3 text-xs text-canvas-text space-y-1'>
             <p>
-              <span className='font-medium'>Your Role:</span> {role || 'viewer'}
+              <span className='font-medium'>Your Role:</span> {role || 'unknown'}
             </p>
             <p>
               <span className='font-medium'>Permissions:</span>{' '}
@@ -126,42 +126,42 @@ export default function ExceptionQueue() {
           {exceptionOrders.length === 0 ? (
             <div className='py-12 text-center'>
               <CheckCircle className='h-12 w-12 text-green-600 mx-auto mb-3 opacity-50' />
-              <p className='text-muted-foreground font-medium'>No exceptions!</p>
-              <p className='text-sm text-muted-foreground'>All orders are processing normally.</p>
+              <p className='text-canvas-text font-medium'>No exceptions!</p>
+              <p className='text-sm text-canvas-text'>All orders are processing normally.</p>
             </div>
           ) : (
             <div className='overflow-x-auto'>
               <Table>
                 <TableHeader>
-                  <TableRow className='hover:bg-transparent border-border'>
-                    <TableHead className='text-foreground font-semibold'>Order #</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Customer</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Reason / Notes</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Created</TableHead>
-                    <TableHead className='text-foreground font-semibold text-right'>Actions</TableHead>
+                  <TableRow className='hover:bg-transparent border-canvas-border'>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Order #</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Customer</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Reason / Notes</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Created</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold text-right'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {exceptionOrders.map((order) => (
                     <TableRow
                       key={order.id}
-                      className='border-border hover:bg-muted/50 transition-colors'
+                      className='border-canvas-border hover:bg-canvas-bg-hover transition-colors'
                     >
-                      <TableCell className='font-semibold text-foreground'>
+                      <TableCell className='font-semibold text-canvas-text-contrast'>
                         {order.orderNumber}
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className='font-medium text-foreground'>{order.customerName}</p>
-                          <p className='text-xs text-muted-foreground'>{order.customerEmail}</p>
+                          <p className='font-medium text-canvas-text-contrast'>{order.customerName}</p>
+                          <p className='text-xs text-canvas-text'>{order.customerEmail}</p>
                         </div>
                       </TableCell>
-                      <TableCell className='text-sm text-muted-foreground'>
+                      <TableCell className='text-sm text-canvas-text'>
                         <div className='max-w-xs truncate'>
                           {order.notes || '(no notes)'}
                         </div>
                       </TableCell>
-                      <TableCell className='text-sm text-muted-foreground'>
+                      <TableCell className='text-sm text-canvas-text'>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className='text-right'>

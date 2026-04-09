@@ -47,7 +47,7 @@ export default function Signup() {
 
   return (
     <div className='min-h-screen bg-canvas-base flex items-center justify-center p-4'>
-      <div className='bg-canvas-bg rounded-2xl border border-canvas-border shadow-lg p-8 space-y-6 w-full max-w-md'>
+      <div className='bg-canvas-bg rounded-2xl border border-canvas-border p-8 space-y-6 w-full max-w-md'>
         <h1 className='text-3xl font-bold text-center text-canvas-text-contrast'>Create Account</h1>
         
         <div className='space-y-4'>

@@ -9,8 +9,6 @@ import { useState } from 'react';
 const ROLE_COLORS: Record<string, string> = {
   admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
   warehouse: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  manager: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  viewer: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
 };
 
 export default function Home() {
@@ -28,17 +26,17 @@ export default function Home() {
     }
   };
 
-  const roleColor = ROLE_COLORS[role || 'viewer'];
+  const roleColor = ROLE_COLORS[role || 'admin'];
 
   return (
-    <div className='min-h-screen bg-background flex flex-col'>
+    <div className='min-h-screen bg-canvas-base flex flex-col'>
       {/* Header/Navbar */}
-      <header className='border-b border-border bg-card sticky top-0 z-50 shadow-sm'>
+      <header className='border-b border-canvas-border bg-canvas-bg sticky top-0 z-50'>
         <div className='max-w-7xl mx-auto px-4 py-4 flex items-center justify-between'>
           <div className='flex items-center gap-3 flex-1 min-w-0'>
             <div className='min-w-0'>
-              <h1 className='text-2xl font-bold text-foreground truncate'>MiniShip CMS</h1>
-              <p className='text-xs text-muted-foreground hidden sm:block'>
+              <h1 className='text-2xl font-bold text-canvas-text-contrast truncate'>MiniShip CMS</h1>
+              <p className='text-xs text-canvas-text hidden sm:block'>
                 Warehouse & Order Management
               </p>
             </div>
@@ -46,9 +44,9 @@ export default function Home() {
 
           <div className='flex items-center gap-2 sm:gap-4 shrink-0'>
             {/* User Info - Hidden on mobile */}
-            <div className='hidden sm:flex items-center gap-3 pr-4 border-r border-border'>
+            <div className='hidden sm:flex items-center gap-3 pr-4 border-r border-canvas-border'>
               <div className='text-right'>
-                <p className='text-sm font-medium text-foreground truncate max-w-xs'>
+                <p className='text-sm font-medium text-canvas-text-contrast truncate max-w-xs'>
                   {user?.email}
                 </p>
                 {role && (
@@ -73,8 +71,8 @@ export default function Home() {
               onClick={handleLogout}
               disabled={isLoggingOut}
               variant='ghost'
-              size='sm'
-              className='gap-2'
+              size='default'
+              className='gap-2 text-canvas-text-contrast'
             >
               <LogOut className='h-4 w-4' />
               <span className='hidden sm:inline'>Logout</span>

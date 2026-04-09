@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Order, OrderStatus } from '@/lib/types';
-import { listenToOrders, addOrder } from '@/lib/firestore';
+import { listenToOrders, addOrder, deleteOrder } from '@/lib/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Table,
@@ -21,9 +21,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Plus, Eye, Loader2 } from 'lucide-react';
+import { AlertCircle, Plus, Eye, Trash2, Loader2 } from 'lucide-react';
 import OrderDetailModal from './OrderDetailModal';
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
@@ -44,9 +53,13 @@ export default function OrdersTable() {
   const [showNewOrderDialog, setShowNewOrderDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // RBAC: Check if user can create orders
-  const canCreateOrder = role === 'admin' || role === 'manager' || role === 'warehouse';
+  // RBAC: Check if user can create orders (Admin only)
+  const canCreateOrder = role === 'admin';
+  const canDeleteOrder = role === 'admin';
 
   // Listen to orders in real-time
   useEffect(() => {
@@ -95,12 +108,31 @@ export default function OrdersTable() {
     setShowDetailModal(true);
   };
 
+  const handleDeleteOrder = (orderToRemove: Order) => {
+    setOrderToDelete(orderToRemove);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!orderToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteOrder(orderToDelete.id);
+      setShowDeleteConfirm(false);
+      setOrderToDelete(null);
+    } catch (error: any) {
+      console.error('Failed to delete order:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
-      <Card className='border border-border'>
+      <Card className='border border-canvas-border'>
         <div className='p-6 space-y-3'>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className='h-12 bg-muted rounded animate-pulse' />
+            <div key={i} className='h-12 bg-canvas-bg-subtle rounded animate-pulse' />
           ))}
         </div>
       </Card>
@@ -109,13 +141,13 @@ export default function OrdersTable() {
 
   return (
     <>
-      <Card className='border border-border'>
+      <Card className='border border-canvas-border bg-canvas-bg'>
         <div className='p-6 space-y-4'>
           {/* Header */}
           <div className='flex items-center justify-between'>
             <div>
-              <h2 className='text-lg font-semibold text-foreground'>Orders</h2>
-              <p className='text-sm text-muted-foreground'>{orders.length} total orders</p>
+              <h2 className='text-lg font-semibold text-canvas-text-contrast'>Orders</h2>
+              <p className='text-sm text-canvas-text'>{orders.length} total orders</p>
             </div>
 
             {/* New Order Dialog - RBAC Protected */}
@@ -144,7 +176,7 @@ export default function OrdersTable() {
 
                 <form onSubmit={handleNewOrder} className='space-y-4'>
                   <div className='space-y-2'>
-                    <label className='block text-sm font-medium text-foreground'>
+                    <label className='block text-sm font-medium text-canvas-text-contrast'>
                       Customer Name
                     </label>
                     <Input
@@ -152,35 +184,35 @@ export default function OrdersTable() {
                       placeholder='John Doe'
                       required
                       disabled={isSubmitting}
-                      className='bg-muted/50'
+                      className='bg-canvas-bg-subtle'
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <label className='block text-sm font-medium text-foreground'>Email</label>
+                    <label className='block text-sm font-medium text-canvas-text-contrast'>Email</label>
                     <Input
                       name='customerEmail'
                       type='email'
                       placeholder='john@example.com'
                       required
                       disabled={isSubmitting}
-                      className='bg-muted/50'
+                      className='bg-canvas-bg-subtle'
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <label className='block text-sm font-medium text-foreground'>Phone</label>
+                    <label className='block text-sm font-medium text-canvas-text-contrast'>Phone</label>
                     <Input
                       name='customerPhone'
                       placeholder='+1 234 567 8900'
                       required
                       disabled={isSubmitting}
-                      className='bg-muted/50'
+                      className='bg-canvas-bg-subtle'
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <label className='block text-sm font-medium text-foreground'>
+                    <label className='block text-sm font-medium text-canvas-text-contrast'>
                       Shipping Address
                     </label>
                     <Textarea
@@ -188,19 +220,19 @@ export default function OrdersTable() {
                       placeholder='123 Main St, City, State ZIP'
                       required
                       disabled={isSubmitting}
-                      className='bg-muted/50'
+                      className='bg-canvas-bg-subtle'
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <label className='block text-sm font-medium text-foreground'>
+                    <label className='block text-sm font-medium text-canvas-text-contrast'>
                       Notes (optional)
                     </label>
                     <Textarea
                       name='notes'
                       placeholder='Any special instructions...'
                       disabled={isSubmitting}
-                      className='bg-muted/50'
+                      className='bg-canvas-bg-subtle'
                     />
                   </div>
 
@@ -225,7 +257,7 @@ export default function OrdersTable() {
               </DialogContent>
             </Dialog>
             ) : (
-              <Button size='sm' disabled title='Only managers and operators can create orders' className='gap-2'>
+              <Button size='sm' disabled title='Only admins can create orders' className='gap-2'>
                 <Plus className='h-4 w-4' />
                 New Order
               </Button>
@@ -235,7 +267,7 @@ export default function OrdersTable() {
           {/* Table */}
           {orders.length === 0 ? (
             <div className='py-12 text-center'>
-              <p className='text-muted-foreground'>
+              <p className='text-canvas-text'>
                 No orders yet. Click "New Order" to create one.
               </p>
             </div>
@@ -243,29 +275,29 @@ export default function OrdersTable() {
             <div className='overflow-x-auto'>
               <Table>
                 <TableHeader>
-                  <TableRow className='hover:bg-transparent border-border'>
-                    <TableHead className='text-foreground font-semibold'>Order #</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Customer</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Status</TableHead>
-                    <TableHead className='text-foreground font-semibold text-right'>Items</TableHead>
-                    <TableHead className='text-foreground font-semibold'>Created</TableHead>
-                    <TableHead className='text-foreground font-semibold text-right'>Actions</TableHead>
+                  <TableRow className='hover:bg-transparent border-canvas-border'>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Order #</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Customer</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Status</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold text-right'>Items</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold'>Created</TableHead>
+                    <TableHead className='text-canvas-text-contrast font-semibold text-right'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {orders.map((order) => (
                     <TableRow
                       key={order.id}
-                      className='border-border hover:bg-muted/50 cursor-pointer transition-colors'
+                      className='border-canvas-border hover:bg-canvas-bg-hover cursor-pointer transition-colors'
                       onClick={() => handleViewOrder(order)}
                     >
-                      <TableCell className='font-semibold text-foreground'>
+                      <TableCell className='font-semibold text-canvas-text-contrast'>
                         {order.orderNumber}
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className='font-medium text-foreground'>{order.customerName}</p>
-                          <p className='text-xs text-muted-foreground'>{order.customerEmail}</p>
+                          <p className='font-medium text-canvas-text-contrast'>{order.customerName}</p>
+                          <p className='text-xs text-canvas-text'>{order.customerEmail}</p>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -273,25 +305,41 @@ export default function OrdersTable() {
                           {order.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className='text-right text-foreground'>
+                      <TableCell className='text-right text-canvas-text-contrast'>
                         {order.items.length}
                       </TableCell>
-                      <TableCell className='text-sm text-muted-foreground'>
+                      <TableCell className='text-sm text-canvas-text'>
                         {new Date(order.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className='text-right'>
-                        <Button
-                          size='sm'
-                          variant='ghost'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewOrder(order);
-                          }}
-                          className='gap-1'
-                        >
-                          <Eye className='h-4 w-4' />
-                          <span className='hidden sm:inline'>View</span>
-                        </Button>
+                        <div className='flex gap-1 justify-end'>
+                          <Button
+                            size='sm'
+                            variant='ghost'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewOrder(order);
+                            }}
+                            className='gap-1'
+                          >
+                            <Eye className='h-4 w-4' />
+                            <span className='hidden sm:inline'>View</span>
+                          </Button>
+                          {canDeleteOrder && (
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteOrder(order);
+                              }}
+                              className='gap-1 text-destructive hover:text-destructive'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                              <span className='hidden sm:inline'>Delete</span>
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -313,6 +361,35 @@ export default function OrdersTable() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete order <strong>{orderToDelete?.orderNumber}</strong>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className='flex gap-2 justify-end'>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
